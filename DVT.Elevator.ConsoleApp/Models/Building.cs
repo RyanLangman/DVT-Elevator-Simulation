@@ -5,7 +5,8 @@ namespace DVT.Elevator.ConsoleApp.Models
     public class Building
     {
         private readonly int _elevatorCount = 4;
-        private readonly int _floorCount = 10;
+        private readonly int _topFloor = 10;
+        private readonly int _bottomFloor = 1;
 
         public List<Floor> Floors { get; set; } = new List<Floor>();
 
@@ -19,11 +20,10 @@ namespace DVT.Elevator.ConsoleApp.Models
         {
             for (var i = 1; i <= _elevatorCount; i++)
             {
-                // Elevators will start at floor 1
                 Elevators.Add(new Elevator(i));
             }
 
-            for (var i = 1; i <= _floorCount; i++)
+            for (var i = _bottomFloor; i <= _topFloor; i++)
             {
                 Floors.Add(new Floor(i, Elevators));
             }
@@ -54,12 +54,12 @@ namespace DVT.Elevator.ConsoleApp.Models
 
         private TimeStepInstructions GetTimeStepInstructions()
         {
-            var timeStepInstructions = new TimeStepInstructions(_floorCount, 1);
+            var timeStepInstructions = new TimeStepInstructions(_topFloor, _bottomFloor);
 
             var validFloorChosen = false;
             while (!validFloorChosen)
             {
-                Console.WriteLine($"Choose floor to call elevator (1-{_floorCount}):");
+                Console.WriteLine($"Choose floor to call elevator ({_bottomFloor}-{_topFloor}):");
                 var userInput = Console.ReadLine();
 
                 validFloorChosen = timeStepInstructions.SetPickupFloorNumber(userInput);
@@ -68,7 +68,7 @@ namespace DVT.Elevator.ConsoleApp.Models
             var validDestinationChosen = false;
             while (!validDestinationChosen)
             {
-                Console.WriteLine($"Choose a destination floor (1-{_floorCount}):");
+                Console.WriteLine($"Choose a destination floor ({_bottomFloor}-{_topFloor}):");
                 var userInput = Console.ReadLine();
 
                 validDestinationChosen = timeStepInstructions.SetDestinationFloorNumber(userInput);
