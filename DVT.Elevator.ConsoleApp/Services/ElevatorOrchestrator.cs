@@ -20,8 +20,7 @@ namespace DVT.Elevator.ConsoleApp.Services
         {
             var floor = sender as Floor;
             var nextAvailableElevator = GetNextAvailableElevator(floor.Id);
-            nextAvailableElevator.PickupFloor = floor.Id;
-            nextAvailableElevator.DestinationFloor = destinationFloor;
+            nextAvailableElevator.SetFloors(floor.Id, destinationFloor);
         }
 
         private Models.Elevator GetNextAvailableElevator(int pickupFloor)
@@ -47,15 +46,8 @@ namespace DVT.Elevator.ConsoleApp.Services
             }
 
             return null;
-
-            // TODO: Handle case where all elevators are in motion, this will need a queueing system
-            // or for somplicity sake, just reject the input until one is idle.
         }
 
-        /// <summary>
-        /// Progress time forward one step (ascend/descend elevators 1 floor and embark/disembark 
-        /// passengers if necessary).
-        /// </summary>
         public void TimeStep(int pickupFloor, int destinationFloor, bool skipInput = false)
         {
             if (!skipInput)
@@ -68,8 +60,7 @@ namespace DVT.Elevator.ConsoleApp.Services
                     return;
                 }
 
-                elevator.PickupFloor = pickupFloor;
-                elevator.DestinationFloor = destinationFloor;
+                elevator.SetFloors(pickupFloor, destinationFloor);
             }
 
             Elevators.ForEach(e => e.MoveOneStep());

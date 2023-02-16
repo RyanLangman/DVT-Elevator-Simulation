@@ -51,9 +51,6 @@ namespace DVT.Elevator.ConsoleApp.Models
                 elevatorOrchestrator.TimeStep(0, 0, true);
             }
             // BONUS: If we have time, implement a queue for elevators
-
-            // TODO: Take as many passengers as the weight limit allows, any outstanding passengers
-            // will wait on the floor and will automatically call the next, closest available elevator
         }
 
         private TimeStepInstructions GetTimeStepInstructions()
