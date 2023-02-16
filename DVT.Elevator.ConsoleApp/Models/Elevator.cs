@@ -4,53 +4,60 @@ namespace DVT.Elevator.ConsoleApp.Models
 {
     public class Elevator
     {
-        public int Id { get; set; }
+        public int Id { get; }
 
-        public int CurrentFloor { get; set; }
+        public int _currentFloor;
+        public int CurrentFloor 
+        { 
+            get { return _currentFloor; }
+        }
 
-        public int? DestinationFloor { get; set; }
+        public int? _destinationFloor;
+        public int? DestinationFloor
+        {
+            get { return _destinationFloor; }
+        }
 
-        public int? PickupFloor { get; set; }
-
-        public int Passengers { get; set; }
+        public int? _pickupFloor;
+        public int? PickupFloor
+        {
+            get { return _pickupFloor; }
+        }
 
         public event EventHandler<EventArgs> OnPickupFloorArrivalEvent;
 
         public int WeightLimit { get; } = 7;
 
+        private int Passengers { get; set; }
+
         public Elevator(int id)
         {
             Id = id;
-            CurrentFloor = 1;
+            _currentFloor = 1;
         }
 
-        public ElevatorDirection Direction
+        public ElevatorState Direction
         {
             get
             {
                 if (PickupFloor != null)
                 {
                     return PickupFloor > CurrentFloor ?
-                        ElevatorDirection.Ascending :
-                        ElevatorDirection.Descending;
+                        ElevatorState.Ascending :
+                        ElevatorState.Descending;
                 }
                 else if (DestinationFloor != null)
                 {
 
                     return DestinationFloor > CurrentFloor ?
-                        ElevatorDirection.Ascending :
-                        ElevatorDirection.Descending;
+                        ElevatorState.Ascending :
+                        ElevatorState.Descending;
                 }
 
-                return ElevatorDirection.Idle;
+                return ElevatorState.Idle;
             }
         }
 
-        /// <summary>
-        /// Move passengers from floor to elevator, constrained to max weight limit of elevator.
-        /// </summary>
-        /// <param name="numberOfPassengers">The number of passengers unable to board the elevator.</param>
-        /// <returns></returns>
         public int OnboardPassengers(int numberOfPassengers)
         {
             var capableOfOnboarding = numberOfPassengers > WeightLimit ? WeightLimit : numberOfPassengers;
@@ -62,46 +69,33 @@ namespace DVT.Elevator.ConsoleApp.Models
 
         public void MoveOneStep()
         {
-            // No destination floor means elevator is idle
             if (DestinationFloor == null && PickupFloor == null)
             {
-                //Console.WriteLine($"E-{Id} is idle.");
                 return;
             }
 
-            // Reached pickup floor, onboarding passengers
             if (CurrentFloor == PickupFloor)
             {
-                //Console.WriteLine($"E-{Id} arrived at F-{CurrentFloor}, ready to onboard passengers.");
                 OnPickupFloorArrivalEvent?.Invoke(this, EventArgs.Empty);
-                PickupFloor = null;
-                // TODO: Update passenger count
-                // TODO: Consider weight limit
+                _pickupFloor = null;
 
                 return;
             }
 
-            // Reached destination floor, offboarding passengers
             if (CurrentFloor == DestinationFloor && PickupFloor == null)
             {
-                DestinationFloor = null;
-                
-                //Console.WriteLine($"E-{Id} is offboarding {Passengers} passengers on F-{CurrentFloor}.");
+                _destinationFloor = null;
                 Passengers = 0;
-
                 return;
             }
 
-            // At this point, we're either going up or down
-            if (Direction == ElevatorDirection.Ascending)
+            if (Direction == ElevatorState.Ascending)
             {
-                CurrentFloor++;
-                //Console.WriteLine($"E-{Id} is ascending to F-{CurrentFloor} with {Passengers} passenger(s).");
+                _currentFloor++;
             }
             else
             {
-                CurrentFloor--;
-                //Console.WriteLine($"E-{Id} is descending to F-{CurrentFloor} with {Passengers} passenger(s).");
+                _currentFloor--;
             }
         }
 
@@ -109,13 +103,13 @@ namespace DVT.Elevator.ConsoleApp.Models
         {
             switch (Direction)
             {
-                case ElevatorDirection.Ascending:
-                case ElevatorDirection.Descending:
+                case ElevatorState.Ascending:
+                case ElevatorState.Descending:
                     if (PickupFloor != null)
                     {
                         if (CurrentFloor == PickupFloor)
                         {
-                            return $"E-{Id} is boarding passenger on F-{CurrentFloor} then headed to F-{DestinationFloor} for dropoff.";
+                            return $"E-{Id} is boarding passengers on F-{CurrentFloor} then headed to F-{DestinationFloor} for dropoff.";
                         }
 
                         return $"E-{Id} is on F-{CurrentFloor}, headed to F-{PickupFloor} for pickup then F-{DestinationFloor} for dropoff.";
@@ -123,15 +117,26 @@ namespace DVT.Elevator.ConsoleApp.Models
 
                     if (CurrentFloor == DestinationFloor)
                     {
-                        return $"E-{Id} dropping off {Passengers} passenger(s) on F-{CurrentFloor}.";
+                        return $"E-{Id} dropping off {Passengers} passengers on F-{CurrentFloor}.";
                     }
 
-                    return $"E-{Id} is on F-{CurrentFloor}, headed to F-{DestinationFloor} to dropoff {Passengers} passenger(s).";
+                    return $"E-{Id} is on F-{CurrentFloor}, headed to F-{DestinationFloor} to dropoff {Passengers} passengers.";
 
-                case ElevatorDirection.Idle:
+                case ElevatorState.Idle:
                 default:
                     return $"E-{Id} is idle on F-{CurrentFloor}.";
             }
+        }
+
+        public void SetFloors(int pickupFloor, int destinationFloor)
+        {
+            if (pickupFloor == destinationFloor)
+            {
+                throw new Exception("Pickup and destination floors cannot be the same.");
+            }
+
+            _pickupFloor = pickupFloor;
+            _destinationFloor = destinationFloor;
         }
     }
 }

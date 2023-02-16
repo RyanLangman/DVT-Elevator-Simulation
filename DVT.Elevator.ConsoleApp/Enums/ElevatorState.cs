@@ -1,6 +1,6 @@
 ﻿namespace DVT.Elevator.ConsoleApp.Enums
 {
-    public enum ElevatorDirection
+    public enum ElevatorState
     {
         Ascending = 1,
         Descending = 2,

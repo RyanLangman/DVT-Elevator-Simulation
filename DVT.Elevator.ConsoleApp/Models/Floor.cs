@@ -2,9 +2,13 @@
 {
     public class Floor
     {
-        public int Id { get; set; }
+        public int Id { get; }
 
-        public int WaitingPassengers { get; set; }
+        public int _waitingPassengers;
+        public int WaitingPassengers
+        {
+            get { return _waitingPassengers; }
+        }
 
         public event EventHandler<int> OnRequestNewPickupEvent;
 
@@ -18,6 +22,16 @@
             });
         }
 
+        public void SetWaitingPassengers(int numberOfPeople)
+        {
+            if (numberOfPeople > 14)
+            {
+                throw new Exception("Too many people!");
+            }
+
+            _waitingPassengers = numberOfPeople;
+        }
+
         private void HandleElevatorPickupArrival(object sender, EventArgs e)
         {
             var elevator = sender as Elevator;
@@ -26,7 +40,7 @@
             {
                 var remainingPassengers = elevator.OnboardPassengers(WaitingPassengers);
 
-                WaitingPassengers = remainingPassengers;
+                _waitingPassengers = remainingPassengers;
 
                 if (WaitingPassengers == 0) return;
 
