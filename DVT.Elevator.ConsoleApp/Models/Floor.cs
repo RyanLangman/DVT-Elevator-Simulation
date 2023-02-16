@@ -6,6 +6,8 @@
 
         public int WaitingPassengers { get; set; }
 
+        public event EventHandler<int> OnRequestNewPickupEvent;
+
         public Floor(int id, List<Elevator> elevators)
         {
             Id = id;
@@ -23,15 +25,18 @@
             if (elevator.CurrentFloor == Id) 
             {
                 var remainingPassengers = elevator.OnboardPassengers(WaitingPassengers);
-                Console.WriteLine($"{WaitingPassengers - remainingPassengers} passengers boarded on E-{elevator.Id}.");
-
-                // TODO: If there are any passengers remaining, we need to call another elevator to take them.
-                Console.WriteLine($"{remainingPassengers} passengers waiting on F-{Id}.");
 
                 WaitingPassengers = remainingPassengers;
+
+                if (WaitingPassengers == 0) return;
+
+                if (!elevator.DestinationFloor.HasValue)
+                {
+                    throw new Exception("Destination floor must be present.");
+                }
+
+                OnRequestNewPickupEvent?.Invoke(this, elevator.DestinationFloor.Value);
             }
         }
-
-        // TODO: Event handler when elevator arriving on this for to disembark passengers?
     }
 }
