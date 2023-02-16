@@ -58,7 +58,7 @@ namespace DVT.Elevator.ConsoleApp.Services
         {
             // First find an idle elevator on current floor
             var idleOnCurrentFloor = Elevators
-                .Where(x => x.Direction == Enums.ElevatorDirection.Idle)
+                .Where(x => x.Direction == Enums.ElevatorState.Idle)
                 .Where(x => x.CurrentFloor == pickupFloor);
 
             if (idleOnCurrentFloor.Any())
@@ -68,7 +68,7 @@ namespace DVT.Elevator.ConsoleApp.Services
 
             // If not, then find the next closest idle elevator
             var closestIdleOnOtherFloors = Elevators
-                .Where(x => x.Direction == Enums.ElevatorDirection.Idle)
+                .Where(x => x.Direction == Enums.ElevatorState.Idle)
                 .OrderBy(x => Math.Abs(x.CurrentFloor - pickupFloor));
 
             if (closestIdleOnOtherFloors.Any())

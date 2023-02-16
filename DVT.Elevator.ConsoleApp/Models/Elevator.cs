@@ -36,25 +36,25 @@ namespace DVT.Elevator.ConsoleApp.Models
             _currentFloor = 1;
         }
 
-        public ElevatorDirection Direction
+        public ElevatorState Direction
         {
             get
             {
                 if (PickupFloor != null)
                 {
                     return PickupFloor > CurrentFloor ?
-                        ElevatorDirection.Ascending :
-                        ElevatorDirection.Descending;
+                        ElevatorState.Ascending :
+                        ElevatorState.Descending;
                 }
                 else if (DestinationFloor != null)
                 {
 
                     return DestinationFloor > CurrentFloor ?
-                        ElevatorDirection.Ascending :
-                        ElevatorDirection.Descending;
+                        ElevatorState.Ascending :
+                        ElevatorState.Descending;
                 }
 
-                return ElevatorDirection.Idle;
+                return ElevatorState.Idle;
             }
         }
 
@@ -89,7 +89,7 @@ namespace DVT.Elevator.ConsoleApp.Models
                 return;
             }
 
-            if (Direction == ElevatorDirection.Ascending)
+            if (Direction == ElevatorState.Ascending)
             {
                 _currentFloor++;
             }
@@ -103,8 +103,8 @@ namespace DVT.Elevator.ConsoleApp.Models
         {
             switch (Direction)
             {
-                case ElevatorDirection.Ascending:
-                case ElevatorDirection.Descending:
+                case ElevatorState.Ascending:
+                case ElevatorState.Descending:
                     if (PickupFloor != null)
                     {
                         if (CurrentFloor == PickupFloor)
@@ -122,7 +122,7 @@ namespace DVT.Elevator.ConsoleApp.Models
 
                     return $"E-{Id} is on F-{CurrentFloor}, headed to F-{DestinationFloor} to dropoff {Passengers} passengers.";
 
-                case ElevatorDirection.Idle:
+                case ElevatorState.Idle:
                 default:
                     return $"E-{Id} is idle on F-{CurrentFloor}.";
             }
