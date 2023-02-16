@@ -4,6 +4,9 @@ namespace DVT.Elevator.ConsoleApp.Models
 {
     public class Building
     {
+        private readonly int _elevatorCount = 4;
+        private readonly int _floorCount = 10;
+
         public List<Floor> Floors { get; set; } = new List<Floor>();
 
         public List<Elevator> Elevators { get; set; } = new List<Elevator>();
@@ -14,23 +17,25 @@ namespace DVT.Elevator.ConsoleApp.Models
 
         public Building()
         {
-            for (var i = 1; i <= 1; i++)
+            for (var i = 1; i <= _elevatorCount; i++)
             {
                 // Elevators will start at floor 1
-                Elevators.Add(new Elevator(1));
+                Elevators.Add(new Elevator(i));
             }
 
-            for (var i = 1; i <= 10; i++)
+            for (var i = 1; i <= _floorCount; i++)
             {
                 Floors.Add(new Floor(i, Elevators));
             }
 
-            elevatorOrchestrator = new ElevatorOrchestrator(Floors, Elevators);
+            elevatorOrchestrator = new ElevatorOrchestrator(Elevators, Floors);
         }
 
         public void Exist()
         {
             // TODO: Validate input
+            elevatorOrchestrator.ShowElevatorStatuses();
+
             Console.WriteLine();
             Console.WriteLine("Skip instructions this step? (y/n)");
             if (Console.ReadLine() != "y")
@@ -43,10 +48,7 @@ namespace DVT.Elevator.ConsoleApp.Models
 
                 Console.WriteLine("Choose a destination floor (1-10): ");
                 var destinationFloor = int.Parse(Console.ReadLine());
-                Console.WriteLine();
 
-                // TODO: Orchestrator will receive inputs and allocate an elevator to that floor
-                // Each time step ascends/descends elevators 1 floor
                 var floor = Floors.First(x => x.Id == callToFloor);
                 floor.WaitingPassengers = passengerCount;
                 elevatorOrchestrator.TimeStep(callToFloor, destinationFloor, false);
@@ -56,14 +58,10 @@ namespace DVT.Elevator.ConsoleApp.Models
                 Console.WriteLine();
                 elevatorOrchestrator.TimeStep(0, 0, true);
             }
-            // TODO: While an elevator is in motion, it's inaccessible to a new pickup
             // BONUS: If we have time, implement a queue for elevators
 
             // TODO: Take as many passengers as the weight limit allows, any outstanding passengers
             // will wait on the floor and will automatically call the next, closest available elevator
-
-            // There will be a constraint here that if all elevators are in motion, then we cannot 
-            // successfully call a new elevator, we must wait for one to complete its dropoff.
         }
     }
 }

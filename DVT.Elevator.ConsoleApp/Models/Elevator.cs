@@ -65,14 +65,14 @@ namespace DVT.Elevator.ConsoleApp.Models
             // No destination floor means elevator is idle
             if (DestinationFloor == null && PickupFloor == null)
             {
-                Console.WriteLine($"E-{Id} is idle.");
+                //Console.WriteLine($"E-{Id} is idle.");
                 return;
             }
 
             // Reached pickup floor, onboarding passengers
             if (CurrentFloor == PickupFloor)
             {
-                Console.WriteLine($"E-{Id} arrived at F-{CurrentFloor}, ready to onboard passengers.");
+                //Console.WriteLine($"E-{Id} arrived at F-{CurrentFloor}, ready to onboard passengers.");
                 OnPickupFloorArrivalEvent?.Invoke(this, EventArgs.Empty);
                 PickupFloor = null;
                 // TODO: Update passenger count
@@ -86,7 +86,7 @@ namespace DVT.Elevator.ConsoleApp.Models
             {
                 DestinationFloor = null;
                 
-                Console.WriteLine($"E-{Id} is offboarding {Passengers} passengers on F-{CurrentFloor}.");
+                //Console.WriteLine($"E-{Id} is offboarding {Passengers} passengers on F-{CurrentFloor}.");
                 Passengers = 0;
 
                 return;
@@ -96,12 +96,41 @@ namespace DVT.Elevator.ConsoleApp.Models
             if (Direction == ElevatorDirection.Ascending)
             {
                 CurrentFloor++;
-                Console.WriteLine($"E-{Id} is ascending to F-{CurrentFloor} with {Passengers} passenger(s).");
+                //Console.WriteLine($"E-{Id} is ascending to F-{CurrentFloor} with {Passengers} passenger(s).");
             }
             else
             {
                 CurrentFloor--;
-                Console.WriteLine($"E-{Id} is descending to F-{CurrentFloor} with {Passengers} passenger(s).");
+                //Console.WriteLine($"E-{Id} is descending to F-{CurrentFloor} with {Passengers} passenger(s).");
+            }
+        }
+
+        public override string ToString()
+        {
+            switch (Direction)
+            {
+                case ElevatorDirection.Ascending:
+                case ElevatorDirection.Descending:
+                    if (PickupFloor != null)
+                    {
+                        if (CurrentFloor == PickupFloor)
+                        {
+                            return $"E-{Id} is boarding passenger on F-{CurrentFloor} then headed to F-{DestinationFloor} for dropoff.";
+                        }
+
+                        return $"E-{Id} is on F-{CurrentFloor}, headed to F-{PickupFloor} for pickup then F-{DestinationFloor} for dropoff.";
+                    }
+
+                    if (CurrentFloor == DestinationFloor)
+                    {
+                        return $"E-{Id} dropping off {Passengers} passenger(s) on F-{CurrentFloor}.";
+                    }
+
+                    return $"E-{Id} is on F-{CurrentFloor}, headed to F-{DestinationFloor} to dropoff {Passengers} passenger(s).";
+
+                case ElevatorDirection.Idle:
+                default:
+                    return $"E-{Id} is idle on F-{CurrentFloor}.";
             }
         }
     }

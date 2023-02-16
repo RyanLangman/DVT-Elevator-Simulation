@@ -4,56 +4,88 @@ namespace DVT.Elevator.ConsoleApp.Services
 {
     public class ElevatorOrchestrator : IElevatorOrchestrator
     {
-        private List<Floor> floors;
-        private List<Models.Elevator> elevators;
+        private List<Models.Elevator> Elevators;
 
-        public ElevatorOrchestrator(List<Floor> floors, List<Models.Elevator> elevators)
+        public ElevatorOrchestrator(List<Models.Elevator> elevators, List<Floor> floors)
         {
-            this.floors = floors;
-            this.elevators = elevators; 
+            Elevators = elevators;
+
+            floors.ForEach(e =>
+            {
+                e.OnRequestNewPickupEvent += HandleElevatorPickupArrival;
+            });
         }
 
-        Models.Elevator IElevatorOrchestrator.GetElevatorStatus(int id)
+        private void HandleElevatorPickupArrival(object sender, int destinationFloor)
         {
-            throw new NotImplementedException();
+            var floor = sender as Floor;
+            var nextAvailableElevator = GetNextAvailableElevator(floor.Id);
+            nextAvailableElevator.PickupFloor = floor.Id;
+            nextAvailableElevator.DestinationFloor = destinationFloor;
         }
 
-        void IElevatorOrchestrator.Pickup(int floorId, int destinationFloor)
+        private Models.Elevator GetNextAvailableElevator(int pickupFloor)
         {
-            // TODO: Get next elevator
-            // Set its pickup point to floorId
-            // Add event handler for when elevator reaches pickup point, then proceed
-            // to destination
-            throw new NotImplementedException();
-        }
+            // First find an idle elevator on current floor
+            var idleOnCurrentFloor = Elevators
+                .Where(x => x.Direction == Enums.ElevatorDirection.Idle)
+                .Where(x => x.CurrentFloor == pickupFloor);
 
-        public void GoToDestination(int floorId)
-        {
-            // TODO: Ascend/descen elevator towards destination floorId
-            // Once reached, add event handler to "disembark" passengers and set
-            // state to idle, awaiting next pickup
-            throw new NotImplementedException();
-        }
+            if (idleOnCurrentFloor.Any())
+            {
+                return idleOnCurrentFloor.First();
+            }
 
-        private Models.Elevator GetNextAvailableElevator()
-        {
-            return elevators.First();
+            // If not, then find the next closest idle elevator
+            var closestIdleOnOtherFloors = Elevators
+                .Where(x => x.Direction == Enums.ElevatorDirection.Idle)
+                .OrderBy(x => Math.Abs(x.CurrentFloor - pickupFloor));
+
+            if (closestIdleOnOtherFloors.Any())
+            {
+                return closestIdleOnOtherFloors.First();
+            }
+
+            return null;
+
+            // TODO: Handle case where all elevators are in motion, this will need a queueing system
+            // or for somplicity sake, just reject the input until one is idle.
         }
 
         /// <summary>
         /// Progress time forward one step (ascend/descend elevators 1 floor and embark/disembark 
         /// passengers if necessary).
         /// </summary>
-        public void TimeStep(int callToFloor, int destinationFloor, bool skipInput = false)
+        public void TimeStep(int pickupFloor, int destinationFloor, bool skipInput = false)
         {
             if (!skipInput)
             {
-                var elevator = GetNextAvailableElevator();
-                elevator.PickupFloor = callToFloor;
+                var elevator = GetNextAvailableElevator(pickupFloor);
+
+                if (elevator == null)
+                {
+                    Console.WriteLine("All elevators in motion, please try again later.");
+                    return;
+                }
+
+                elevator.PickupFloor = pickupFloor;
                 elevator.DestinationFloor = destinationFloor;
             }
 
-            elevators.ForEach(e => e.MoveOneStep());
+            Elevators.ForEach(e => e.MoveOneStep());
+
+            ShowElevatorStatuses();
+        }
+
+        public void ShowElevatorStatuses()
+        {
+            // TODO: Combine elevator and floor information to displaying waiting passengers
+            //Console.WriteLine($"{WaitingPassengers - remainingPassengers} passengers boarded on E-{elevator.Id}.");
+            //Console.WriteLine($"{remainingPassengers} passengers waiting on F-{Id}.");
+            Console.Clear();
+            Console.WriteLine("------ Elevators 1-4 Info ------");
+            Elevators.ForEach(x => Console.WriteLine(x.ToString()));
+            Console.WriteLine("------ Elevators 1-4 Info ------");
         }
     }
 }
