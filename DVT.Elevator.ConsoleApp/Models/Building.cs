@@ -42,7 +42,7 @@ namespace DVT.Elevator.ConsoleApp.Models
                 var timeStepInstructions = GetTimeStepInstructions();
 
                 var floor = Floors.First(x => x.Id == timeStepInstructions.PickupFloor);
-                floor.WaitingPassengers = timeStepInstructions.NumberOfPeople;
+                floor.SetWaitingPassengers(timeStepInstructions.NumberOfPeople);
                 elevatorOrchestrator.TimeStep(timeStepInstructions.PickupFloor, timeStepInstructions.DestinationFloor, false);
             }
             else
@@ -50,7 +50,6 @@ namespace DVT.Elevator.ConsoleApp.Models
                 Console.WriteLine();
                 elevatorOrchestrator.TimeStep(0, 0, true);
             }
-            // BONUS: If we have time, implement a queue for elevators
         }
 
         private TimeStepInstructions GetTimeStepInstructions()

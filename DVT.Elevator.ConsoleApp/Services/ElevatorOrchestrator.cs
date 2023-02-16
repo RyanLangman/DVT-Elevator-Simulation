@@ -16,6 +16,37 @@ namespace DVT.Elevator.ConsoleApp.Services
             });
         }
 
+        public void TimeStep(int pickupFloor, int destinationFloor, bool skipInput = false)
+        {
+            if (!skipInput)
+            {
+                var elevator = GetNextAvailableElevator(pickupFloor);
+
+                if (elevator == null)
+                {
+                    Console.WriteLine("All elevators in motion, please try again later.");
+                    return;
+                }
+
+                elevator.SetFloors(pickupFloor, destinationFloor);
+            }
+
+            Elevators.ForEach(e => e.MoveOneStep());
+
+            ShowElevatorStatuses();
+        }
+
+        public void ShowElevatorStatuses()
+        {
+            // TODO: Combine elevator and floor information to displaying waiting passengers
+            //Console.WriteLine($"{WaitingPassengers - remainingPassengers} passengers boarded on E-{elevator.Id}.");
+            //Console.WriteLine($"{remainingPassengers} passengers waiting on F-{Id}.");
+            Console.Clear();
+            Console.WriteLine("------ Elevators 1-4 Info ------");
+            Elevators.ForEach(x => Console.WriteLine(x.ToString()));
+            Console.WriteLine("------ Elevators 1-4 Info ------");
+        }
+
         private void HandleElevatorPickupArrival(object sender, int destinationFloor)
         {
             var floor = sender as Floor;
@@ -46,37 +77,6 @@ namespace DVT.Elevator.ConsoleApp.Services
             }
 
             return null;
-        }
-
-        public void TimeStep(int pickupFloor, int destinationFloor, bool skipInput = false)
-        {
-            if (!skipInput)
-            {
-                var elevator = GetNextAvailableElevator(pickupFloor);
-
-                if (elevator == null)
-                {
-                    Console.WriteLine("All elevators in motion, please try again later.");
-                    return;
-                }
-
-                elevator.SetFloors(pickupFloor, destinationFloor);
-            }
-
-            Elevators.ForEach(e => e.MoveOneStep());
-
-            ShowElevatorStatuses();
-        }
-
-        public void ShowElevatorStatuses()
-        {
-            // TODO: Combine elevator and floor information to displaying waiting passengers
-            //Console.WriteLine($"{WaitingPassengers - remainingPassengers} passengers boarded on E-{elevator.Id}.");
-            //Console.WriteLine($"{remainingPassengers} passengers waiting on F-{Id}.");
-            Console.Clear();
-            Console.WriteLine("------ Elevators 1-4 Info ------");
-            Elevators.ForEach(x => Console.WriteLine(x.ToString()));
-            Console.WriteLine("------ Elevators 1-4 Info ------");
         }
     }
 }
