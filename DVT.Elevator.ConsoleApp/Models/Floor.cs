@@ -1,25 +1,37 @@
-﻿using DVT.Elevator.ConsoleApp.Enums;
-using DVT.Elevator.ConsoleApp.Services;
-
-namespace DVT.Elevator.ConsoleApp.Models
+﻿namespace DVT.Elevator.ConsoleApp.Models
 {
     public class Floor
     {
         public int Id { get; set; }
 
-        public List<Passenger> WaitingPassengers { get; set; } = new List<Passenger>();
+        public int WaitingPassengers { get; set; }
 
-        private readonly IElevatorCaller elevatorControlPanel;
-
-        public Floor(int id)
+        public Floor(int id, List<Elevator> elevators)
         {
             Id = id;
-            elevatorControlPanel = new ElevatorCaller();
+
+            elevators.ForEach(e =>
+            {
+                e.OnPickupFloorArrivalEvent += HandleElevatorPickupArrival;
+            });
         }
 
-        void CallElevator(ElevatorDirection direction)
+        private void HandleElevatorPickupArrival(object sender, EventArgs e)
         {
-            elevatorControlPanel.CallElevator(Id, direction);
+            var elevator = sender as Elevator;
+
+            if (elevator.CurrentFloor == Id) 
+            {
+                var remainingPassengers = elevator.OnboardPassengers(WaitingPassengers);
+                Console.WriteLine($"{WaitingPassengers - remainingPassengers} passengers boarded on E-{elevator.Id}.");
+
+                // TODO: If there are any passengers remaining, we need to call another elevator to take them.
+                Console.WriteLine($"{remainingPassengers} passengers waiting on F-{Id}.");
+
+                WaitingPassengers = remainingPassengers;
+            }
         }
+
+        // TODO: Event handler when elevator arriving on this for to disembark passengers?
     }
 }

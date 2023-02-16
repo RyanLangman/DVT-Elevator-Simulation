@@ -1,10 +1,8 @@
 ﻿using DVT.Elevator.ConsoleApp.Models;
 
-Console.WriteLine("Hello, World!");
-
 var building = new Building();
 
-while (true)
+while (building.Exists)
 {
     building.Exist();
 }
