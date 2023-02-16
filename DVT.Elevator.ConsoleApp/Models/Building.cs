@@ -33,25 +33,17 @@ namespace DVT.Elevator.ConsoleApp.Models
 
         public void Exist()
         {
-            // TODO: Validate input
             elevatorOrchestrator.ShowElevatorStatuses();
 
             Console.WriteLine();
             Console.WriteLine("Skip instructions this step? (y/n)");
             if (Console.ReadLine() != "y")
             {
-                Console.WriteLine("Choose floor to call elevator (1-10): ");
-                var callToFloor = int.Parse(Console.ReadLine());
+                var timeStepInstructions = GetTimeStepInstructions();
 
-                Console.WriteLine("How many passengers? ");
-                var passengerCount = int.Parse(Console.ReadLine());
-
-                Console.WriteLine("Choose a destination floor (1-10): ");
-                var destinationFloor = int.Parse(Console.ReadLine());
-
-                var floor = Floors.First(x => x.Id == callToFloor);
-                floor.WaitingPassengers = passengerCount;
-                elevatorOrchestrator.TimeStep(callToFloor, destinationFloor, false);
+                var floor = Floors.First(x => x.Id == timeStepInstructions.PickupFloor);
+                floor.WaitingPassengers = timeStepInstructions.NumberOfPeople;
+                elevatorOrchestrator.TimeStep(timeStepInstructions.PickupFloor, timeStepInstructions.DestinationFloor, false);
             }
             else
             {
@@ -62,6 +54,40 @@ namespace DVT.Elevator.ConsoleApp.Models
 
             // TODO: Take as many passengers as the weight limit allows, any outstanding passengers
             // will wait on the floor and will automatically call the next, closest available elevator
+        }
+
+        private TimeStepInstructions GetTimeStepInstructions()
+        {
+            var timeStepInstructions = new TimeStepInstructions(_floorCount, 1);
+
+            var validFloorChosen = false;
+            while (!validFloorChosen)
+            {
+                Console.WriteLine($"Choose floor to call elevator (1-{_floorCount}):");
+                var userInput = Console.ReadLine();
+
+                validFloorChosen = timeStepInstructions.SetPickupFloorNumber(userInput);
+            }
+
+            var validDestinationChosen = false;
+            while (!validDestinationChosen)
+            {
+                Console.WriteLine($"Choose a destination floor (1-{_floorCount}):");
+                var userInput = Console.ReadLine();
+
+                validDestinationChosen = timeStepInstructions.SetDestinationFloorNumber(userInput);
+            }
+
+            var validNumberOfPeople = false;
+            while (!validNumberOfPeople)
+            {
+                Console.WriteLine("How many people need a lift?");
+                var userInput = Console.ReadLine();
+
+                validNumberOfPeople = timeStepInstructions.SetAwaitingPassengers(userInput);
+            }
+
+            return timeStepInstructions;
         }
     }
 }
