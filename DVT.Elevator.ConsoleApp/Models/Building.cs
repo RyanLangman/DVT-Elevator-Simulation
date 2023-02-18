@@ -1,54 +1,61 @@
-﻿using DVT.Elevator.ConsoleApp.Services;
+﻿using DVT.Elevator.ConsoleApp.Models.Interfaces;
+using DVT.Elevator.ConsoleApp.Services;
 
 namespace DVT.Elevator.ConsoleApp.Models
 {
     public class Building
     {
-        private readonly int _elevatorCount = 4;
         private readonly int _topFloor = 10;
         private readonly int _bottomFloor = 1;
 
-        public List<Floor> Floors { get; set; } = new List<Floor>();
+        public List<IFloor> Floors { get; set; } = new List<IFloor>();
+        public List<IElevator> Elevators { get; set; } = new List<IElevator>();
 
-        public List<Elevator> Elevators { get; set; } = new List<Elevator>();
-
-        private readonly IElevatorOrchestrator elevatorOrchestrator;
+        private readonly IElevatorOrchestrator ElevatorOrchestrator;
 
         public bool Exists { get; set; } = true;
 
-        public Building()
+        public Building(List<IElevator> elevators, IElevatorOrchestrator elevatorOrchestrator)
         {
-            for (var i = 1; i <= _elevatorCount; i++)
-            {
-                Elevators.Add(new Elevator(i, _bottomFloor));
-            }
+            Elevators = elevators;
+            ElevatorOrchestrator = elevatorOrchestrator;
 
-            for (var i = _bottomFloor; i <= _topFloor; i++)
+            // The building needs its floors constructed
+            for (var i = 1; i <= _topFloor; i++)
             {
                 Floors.Add(new Floor(i, Elevators));
             }
 
-            elevatorOrchestrator = new ElevatorOrchestrator(Elevators, Floors);
+            // Since the floors have now been built, we inform the orchestrator of this 
+            // construction so its aware of what floors exist
+            elevatorOrchestrator.SetupFloors(Floors);
         }
 
         public void Exist()
         {
-            elevatorOrchestrator.ShowElevatorStatuses();
+            ElevatorOrchestrator.ShowElevatorStatuses();
 
-            Console.WriteLine("Skip instructions this step? (y/n)");
+            Console.WriteLine("Press enter to continue or enter 's' to skip step, 'q' to quit.");
 
-            if (Console.ReadLine() != "y")
+            var command = Console.ReadLine();
+
+            if (command != null && command.ToLower() == "q")
+            {
+                Exists = false;
+                return;
+            }
+
+            if (command == null || string.IsNullOrWhiteSpace(command))
             {
                 var timeStepInstructions = GetTimeStepInstructions();
 
                 var floor = Floors.First(x => x.Id == timeStepInstructions.PickupFloor);
                 floor.SetWaitingPassengers(timeStepInstructions.NumberOfPeople);
-                elevatorOrchestrator.TimeStep(timeStepInstructions.PickupFloor, timeStepInstructions.DestinationFloor, false);
+                ElevatorOrchestrator.TimeStep(timeStepInstructions.PickupFloor, timeStepInstructions.DestinationFloor, false);
             }
             else
             {
-                Console.WriteLine();
-                elevatorOrchestrator.TimeStep(0, 0, true);
+                ElevatorOrchestrator.TimeStep(0, 0, true);
             }
         }
 

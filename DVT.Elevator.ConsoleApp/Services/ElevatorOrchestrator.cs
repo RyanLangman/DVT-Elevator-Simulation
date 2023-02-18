@@ -1,15 +1,19 @@
 ﻿using DVT.Elevator.ConsoleApp.Models;
+using DVT.Elevator.ConsoleApp.Models.Interfaces;
 
 namespace DVT.Elevator.ConsoleApp.Services
 {
     public class ElevatorOrchestrator : IElevatorOrchestrator
     {
-        private List<Models.Elevator> Elevators;
+        private List<IElevator> Elevators;
 
-        public ElevatorOrchestrator(List<Models.Elevator> elevators, List<Floor> floors)
+        public ElevatorOrchestrator(List<IElevator> elevators)
         {
             Elevators = elevators;
+        }
 
+        public void SetupFloors(List<IFloor> floors)
+        {
             floors.ForEach(e =>
             {
                 e.OnRequestNewPickupEvent += HandleElevatorPickupArrival;
@@ -39,9 +43,9 @@ namespace DVT.Elevator.ConsoleApp.Services
         public void ShowElevatorStatuses()
         {
             if (!Console.IsOutputRedirected) Console.Clear();
-            Console.WriteLine("------ Elevators 1-4 Info ------");
+            Console.WriteLine("------------------------------------------");
             Elevators.ForEach(x => Console.WriteLine(x.ToString()));
-            Console.WriteLine("------ Elevators 1-4 Info ------");
+            Console.WriteLine("------------------------------------------");
         }
 
         private void HandleElevatorPickupArrival(object sender, int destinationFloor)
@@ -51,7 +55,7 @@ namespace DVT.Elevator.ConsoleApp.Services
             nextAvailableElevator.SetFloors(floor.Id, destinationFloor);
         }
 
-        private Models.Elevator GetNextAvailableElevator(int pickupFloor)
+        private IElevator GetNextAvailableElevator(int pickupFloor)
         {
             // First find an idle elevator on current floor
             var idleOnCurrentFloor = Elevators

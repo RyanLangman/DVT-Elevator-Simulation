@@ -1,14 +1,15 @@
 using DVT.Elevator.ConsoleApp.Enums;
 using DVT.Elevator.ConsoleApp.Models;
+using DVT.Elevator.ConsoleApp.Models.Interfaces;
 using DVT.Elevator.ConsoleApp.Services;
 
 namespace DVT.Elevator.Tests
 {
     public class ElevatorLogicTests
     {
-        private IElevatorOrchestrator elevatorOrchestrator;
-        public List<Floor> Floors { get; set; } = new List<Floor>();
-        public List<ConsoleApp.Models.Elevator> Elevators { get; set; } = new List<ConsoleApp.Models.Elevator>();
+        private IElevatorOrchestrator ElevatorOrchestrator;
+        public List<IFloor> Floors { get; set; } = new List<IFloor>();
+        public List<IElevator> Elevators { get; set; } = new List<IElevator>();
 
         [Fact]
         public void Chooses_Idle_Elevator_On_Current_Floor()
@@ -17,7 +18,7 @@ namespace DVT.Elevator.Tests
             SetupForEachTest();
 
             // Act
-            elevatorOrchestrator.TimeStep(6, 5, false);
+            ElevatorOrchestrator.TimeStep(6, 5, false);
 
             // Assert
             var ele = Elevators.First(x => x.Id == 3);
@@ -31,7 +32,7 @@ namespace DVT.Elevator.Tests
             SetupForEachTest();
 
             // Act
-            elevatorOrchestrator.TimeStep(3, 5, false);
+            ElevatorOrchestrator.TimeStep(3, 5, false);
 
             // Assert
             var ele = Elevators.First(x => x.Id == 4);
@@ -45,8 +46,8 @@ namespace DVT.Elevator.Tests
             SetupForEachTest();
 
             // Act
-            elevatorOrchestrator.TimeStep(2, 4, false);
-            elevatorOrchestrator.TimeStep(0, 0, true);
+            ElevatorOrchestrator.TimeStep(2, 4, false);
+            ElevatorOrchestrator.TimeStep(0, 0, true);
 
             // Assert
             var ele = Elevators.First(x => x.Id == 4);
@@ -60,8 +61,8 @@ namespace DVT.Elevator.Tests
             SetupForEachTest();
 
             // Act
-            elevatorOrchestrator.TimeStep(6, 3, false);
-            elevatorOrchestrator.TimeStep(0, 0, true);
+            ElevatorOrchestrator.TimeStep(6, 3, false);
+            ElevatorOrchestrator.TimeStep(0, 0, true);
 
             // Assert
             var ele = Elevators.First(x => x.Id == 3);
@@ -74,13 +75,14 @@ namespace DVT.Elevator.Tests
             Elevators.Add(new ConsoleApp.Models.Elevator(2, 1));
             Elevators.Add(new ConsoleApp.Models.Elevator(3, 6));
             Elevators.Add(new ConsoleApp.Models.Elevator(4, 2));
+            ElevatorOrchestrator = new ElevatorOrchestrator(Elevators);
 
             for (var i = 1; i <= 10; i++)
             {
                 Floors.Add(new Floor(i, Elevators));
             }
 
-            elevatorOrchestrator = new ElevatorOrchestrator(Elevators, Floors);
+            ElevatorOrchestrator.SetupFloors(Floors);
         }
     }
 }

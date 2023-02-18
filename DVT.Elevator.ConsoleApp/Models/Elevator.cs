@@ -1,8 +1,9 @@
 ﻿using DVT.Elevator.ConsoleApp.Enums;
+using DVT.Elevator.ConsoleApp.Models.Interfaces;
 
 namespace DVT.Elevator.ConsoleApp.Models
 {
-    public class Elevator
+    public class Elevator: IElevator
     {
         public int Id { get; }
 

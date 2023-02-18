@@ -1,6 +1,8 @@
-﻿namespace DVT.Elevator.ConsoleApp.Models
+﻿using DVT.Elevator.ConsoleApp.Models.Interfaces;
+
+namespace DVT.Elevator.ConsoleApp.Models
 {
-    public class Floor
+    public class Floor: IFloor
     {
         public int Id { get; }
 
@@ -12,7 +14,7 @@
 
         public event EventHandler<int> OnRequestNewPickupEvent;
 
-        public Floor(int id, List<Elevator> elevators)
+        public Floor(int id, List<IElevator> elevators)
         {
             Id = id;
 
