@@ -20,7 +20,7 @@ namespace DVT.Elevator.ConsoleApp.Models
         {
             for (var i = 1; i <= _elevatorCount; i++)
             {
-                Elevators.Add(new Elevator(i));
+                Elevators.Add(new Elevator(i, _bottomFloor));
             }
 
             for (var i = _bottomFloor; i <= _topFloor; i++)
@@ -35,8 +35,8 @@ namespace DVT.Elevator.ConsoleApp.Models
         {
             elevatorOrchestrator.ShowElevatorStatuses();
 
-            Console.WriteLine();
             Console.WriteLine("Skip instructions this step? (y/n)");
+
             if (Console.ReadLine() != "y")
             {
                 var timeStepInstructions = GetTimeStepInstructions();

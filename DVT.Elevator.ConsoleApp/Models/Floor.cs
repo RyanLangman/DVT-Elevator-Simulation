@@ -4,7 +4,7 @@
     {
         public int Id { get; }
 
-        public int _waitingPassengers;
+        private int _waitingPassengers;
         public int WaitingPassengers
         {
             get { return _waitingPassengers; }

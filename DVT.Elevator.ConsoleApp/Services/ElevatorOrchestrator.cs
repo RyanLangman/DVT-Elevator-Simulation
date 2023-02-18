@@ -38,10 +38,7 @@ namespace DVT.Elevator.ConsoleApp.Services
 
         public void ShowElevatorStatuses()
         {
-            // TODO: Combine elevator and floor information to displaying waiting passengers
-            //Console.WriteLine($"{WaitingPassengers - remainingPassengers} passengers boarded on E-{elevator.Id}.");
-            //Console.WriteLine($"{remainingPassengers} passengers waiting on F-{Id}.");
-            Console.Clear();
+            if (!Console.IsOutputRedirected) Console.Clear();
             Console.WriteLine("------ Elevators 1-4 Info ------");
             Elevators.ForEach(x => Console.WriteLine(x.ToString()));
             Console.WriteLine("------ Elevators 1-4 Info ------");
@@ -58,7 +55,7 @@ namespace DVT.Elevator.ConsoleApp.Services
         {
             // First find an idle elevator on current floor
             var idleOnCurrentFloor = Elevators
-                .Where(x => x.Direction == Enums.ElevatorState.Idle)
+                .Where(x => x.State == Enums.ElevatorState.Idle)
                 .Where(x => x.CurrentFloor == pickupFloor);
 
             if (idleOnCurrentFloor.Any())
@@ -68,7 +65,7 @@ namespace DVT.Elevator.ConsoleApp.Services
 
             // If not, then find the next closest idle elevator
             var closestIdleOnOtherFloors = Elevators
-                .Where(x => x.Direction == Enums.ElevatorState.Idle)
+                .Where(x => x.State == Enums.ElevatorState.Idle)
                 .OrderBy(x => Math.Abs(x.CurrentFloor - pickupFloor));
 
             if (closestIdleOnOtherFloors.Any())

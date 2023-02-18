@@ -6,19 +6,19 @@ namespace DVT.Elevator.ConsoleApp.Models
     {
         public int Id { get; }
 
-        public int _currentFloor;
+        private int _currentFloor;
         public int CurrentFloor 
         { 
             get { return _currentFloor; }
         }
 
-        public int? _destinationFloor;
+        private int? _destinationFloor;
         public int? DestinationFloor
         {
             get { return _destinationFloor; }
         }
 
-        public int? _pickupFloor;
+        private int? _pickupFloor;
         public int? PickupFloor
         {
             get { return _pickupFloor; }
@@ -28,15 +28,19 @@ namespace DVT.Elevator.ConsoleApp.Models
 
         public int WeightLimit { get; } = 7;
 
-        private int Passengers { get; set; }
-
-        public Elevator(int id)
+        private int _passengers;
+        public int Passengers 
         {
-            Id = id;
-            _currentFloor = 1;
+            get { return _passengers; }
         }
 
-        public ElevatorState Direction
+        public Elevator(int id, int startingFloor)
+        {
+            Id = id;
+            _currentFloor = startingFloor;
+        }
+
+        public ElevatorState State
         {
             get
             {
@@ -62,7 +66,7 @@ namespace DVT.Elevator.ConsoleApp.Models
         {
             var capableOfOnboarding = numberOfPassengers > WeightLimit ? WeightLimit : numberOfPassengers;
 
-            Passengers = capableOfOnboarding;
+            _passengers = capableOfOnboarding;
 
             return numberOfPassengers > WeightLimit ? numberOfPassengers - WeightLimit : 0;
         }
@@ -85,11 +89,11 @@ namespace DVT.Elevator.ConsoleApp.Models
             if (CurrentFloor == DestinationFloor && PickupFloor == null)
             {
                 _destinationFloor = null;
-                Passengers = 0;
+                _passengers = 0;
                 return;
             }
 
-            if (Direction == ElevatorState.Ascending)
+            if (State == ElevatorState.Ascending)
             {
                 _currentFloor++;
             }
@@ -101,7 +105,7 @@ namespace DVT.Elevator.ConsoleApp.Models
 
         public override string ToString()
         {
-            switch (Direction)
+            switch (State)
             {
                 case ElevatorState.Ascending:
                 case ElevatorState.Descending:
@@ -117,10 +121,10 @@ namespace DVT.Elevator.ConsoleApp.Models
 
                     if (CurrentFloor == DestinationFloor)
                     {
-                        return $"E-{Id} dropping off {Passengers} passengers on F-{CurrentFloor}.";
+                        return $"E-{Id} dropping off {_passengers} passengers on F-{CurrentFloor}.";
                     }
 
-                    return $"E-{Id} is on F-{CurrentFloor}, headed to F-{DestinationFloor} to dropoff {Passengers} passengers.";
+                    return $"E-{Id} is on F-{CurrentFloor}, headed to F-{DestinationFloor} to dropoff {_passengers} passengers.";
 
                 case ElevatorState.Idle:
                 default:
