@@ -1,6 +1,6 @@
 # Simple Elevatur Simulation
 This solution simulates the behaviour of elevators picking up and transporting passengers to other floors.
-The logic behind the elevators is simplistic and doesn't currently support queueing (application constraints listed in "Constraints" section below).
+The logic behind the elevators is simplistic and doesn't currently support queuing (application constraints listed in "Constraints" section below).
 
 ## Dependencies
 Built with .NET 7.
@@ -74,3 +74,11 @@ Lastly on the SOLID principles front, each class sticks to its own responsibilit
 Notably on the OOP side, there's clear encapsulation on the Floor, Elevator and ElevatorOrchestrator classes, only providing access to certain properties that needs to be externally exposed as well as protecting its invariance through public methods that change its internal state. This is particularly important as we need to maintain consistency and integrity of these objects state over time. 
 
 As mentioned above, there's no sub-classing here, so there's no good example of Inheritance being used here, however we are using Polymorphism by way of Interfaces which enables us to create generic contracts for our classes to use, allowing for future additions of new types without modifying excessive amounts of code, hence achieving loose coupling.
+
+## Unit Tests
+Some basic surface level unit tests were implemented, which covers a few cases of passenger counts being correctly updated as we're instructing elevators around floors as well as the basic behaviour of elevators being optimally chosen (given the constraints).
+
+A TDD approach was not taken as this was not a requirement in the specifications. However,
+if one were to begin using TDD moving forward, a good set of unit tests to write next would be to cover the behaviour of queuing and the associated logic. The unit tests would fail first, then the relevant classes would be updated along with the logic to pass the unit tests.
+
+Built with xUnit for no particular reason.
